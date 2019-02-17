@@ -1,0 +1,7 @@
+= Standard Notes Server's DockerFile
+
+A Dockerfile for the https://github.com/standardfile/ruby-server[Standard Notes server],
+to create and push a Docker image on
+https://hub.docker.com/r/arugifa/standardnotes-server[Docker Hub].
+
+Used by https://github.com/arugifa/klougle[Kloügle].
