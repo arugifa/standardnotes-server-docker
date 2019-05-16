@@ -21,9 +21,10 @@ services:
 
   sut:
     image: alpine:latest
-    # Wait for database container to start before running the test.
+    # Wait for the database container to start,
+    # and the StandardNotes server to run migrations, before running tests
     command: >
       sh -c 'while ! nc -vz db 3306 ; do sleep 10 ; done &&
-             for i in 1 2 3 4 5 6; do nc -vz app 3000 && break || if [ "$$i" != 6 ]; then sleep 10 ; else exit 1 ; fi; done'
+             for i in 1 2 3 4 5 6; do wget app:3000 && break || if [ "$$i" != 6 ]; then sleep 10 ; else exit 1 ; fi; done'
     depends_on:
       - app
