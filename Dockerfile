@@ -3,7 +3,7 @@
 FROM ubuntu:16.04
 
 ENV PROJECT_REPO=https://github.com/standardfile/ruby-server
-ENV PROJECT_COMMIT=0e5e0e1d4c7014a3bfc23fba3a74152f6e804885
+ENV PROJECT_COMMIT=5bf417af20f4ccd98f1872bd0d8586bdbd224f13
 ENV PROJECT_DIR=/data/src/
 
 RUN DEBIAN_FRONTEND=noninteractive \
