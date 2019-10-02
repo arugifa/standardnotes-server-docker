@@ -3,7 +3,7 @@
 FROM ubuntu:16.04
 
 ENV PROJECT_REPO=https://github.com/standardfile/ruby-server
-ENV PROJECT_COMMIT=5bf417af20f4ccd98f1872bd0d8586bdbd224f13
+ENV PROJECT_COMMIT=20d74bf5fe22ca18737b00354d23ba06e6136bfe
 ENV PROJECT_DIR=/data/src/
 
 RUN DEBIAN_FRONTEND=noninteractive \
@@ -15,7 +15,6 @@ RUN DEBIAN_FRONTEND=noninteractive \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
     apt-get autoremove -y && \
     apt-get clean
-RUN npm install -g bower
 
 RUN git clone $PROJECT_REPO $PROJECT_DIR && \
     cd $PROJECT_DIR && \
@@ -24,7 +23,6 @@ RUN git clone $PROJECT_REPO $PROJECT_DIR && \
 WORKDIR $PROJECT_DIR
 
 RUN bundle install
-RUN bower install --allow-root
 RUN bundle exec rake assets:precompile
 
 EXPOSE 3000
