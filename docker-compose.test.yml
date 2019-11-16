@@ -9,9 +9,9 @@ services:
     entrypoint: ''
     # Wait for database container to start before running the server.
     command: >
-      bash -c 'while ! nc -vz db 3306 ; do sleep 10 ; done &&
-               /data/src/docker/entrypoint bootstrap &&
-               /data/src/docker/entrypoint start'
+      sh -c 'while ! nc -vz db 3306 ; do sleep 10 ; done &&
+             /data/src/docker/entrypoint bootstrap &&
+             /data/src/docker/entrypoint start'
     depends_on:
       - db
 

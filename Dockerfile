@@ -1,20 +1,24 @@
 # Based on https://github.com/standardfile/ruby-server/blob/master/Dockerfile
 
-FROM ubuntu:16.04
+FROM ruby:2-alpine
 
 ENV PROJECT_REPO=https://github.com/standardfile/ruby-server
-ENV PROJECT_COMMIT=20d74bf5fe22ca18737b00354d23ba06e6136bfe
+ENV PROJECT_COMMIT=40b99331863ca0de7dfdb96c81cf875da25e319f
 ENV PROJECT_DIR=/data/src/
 
-RUN DEBIAN_FRONTEND=noninteractive \
-    apt-get -y update && \
-    apt-get -y install git build-essential ruby-dev ruby-rails libz-dev libmysqlclient-dev curl tzdata netcat && \
-    curl -sL https://deb.nodesource.com/setup_6.x | bash - && \
-    apt-get -y update && \
-    apt-get -y install nodejs && \
-    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
-    apt-get autoremove -y && \
-    apt-get clean
+# Build and test dependencies.
+RUN apk add --update --no-cache \
+    git \
+    netcat-openbsd
+
+# Application's dependencies.
+RUN apk add --update --no-cache \
+    build-base \
+    mariadb-connector-c \
+    mariadb-dev \
+    nodejs \
+    tzdata \
+    zlib-dev
 
 RUN git clone $PROJECT_REPO $PROJECT_DIR && \
     cd $PROJECT_DIR && \
@@ -22,8 +26,12 @@ RUN git clone $PROJECT_REPO $PROJECT_DIR && \
 
 WORKDIR $PROJECT_DIR
 
+RUN gem install bundler:2.0.2
 RUN bundle install
 RUN bundle exec rake assets:precompile
+
+# See https://github.com/brianmario/mysql2/issues/1023
+RUN mkdir ./lib/mariadb && ln -s /usr/lib/mariadb/plugin ./lib/mariadb/plugin
 
 EXPOSE 3000
 
