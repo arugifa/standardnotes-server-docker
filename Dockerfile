@@ -2,9 +2,22 @@
 
 FROM ruby:2-alpine
 
-ENV PROJECT_REPO=https://github.com/standardfile/ruby-server
-ENV PROJECT_COMMIT=40b99331863ca0de7dfdb96c81cf875da25e319f
-ENV PROJECT_DIR=/data/src/
+EXPOSE 3000
+
+ENV PROJECT_REPO=https://github.com/standardnotes/syncing-server
+ENV PROJECT_COMMIT=2a7abc3476b102cc349719c8e6a6cf7bac889399
+ENV PROJECT_DIR=/src/
+
+# Application settings.
+ENV DB_HOST=standardnotes-db
+ENV DB_DATABASE=standardnotes
+ENV DB_USERNAME=standardnotes
+ENV DB_PASSWORD=TO_BE_DEFINED
+ENV DISABLE_USER_REGISTRATION=false
+ENV RAILS_ENV=production
+ENV RAILS_SERVE_STATIC_FILES=true
+# Secret key should not include special characters:
+ENV SECRET_KEY_BASE=TO_BE_DEFINED
 
 # Build and test dependencies.
 RUN apk add --update --no-cache \
@@ -28,12 +41,8 @@ WORKDIR $PROJECT_DIR
 
 RUN gem install bundler:2.0.2
 RUN bundle install
-RUN bundle exec rake assets:precompile
 
 # See https://github.com/brianmario/mysql2/issues/1023
 RUN mkdir ./lib/mariadb && ln -s /usr/lib/mariadb/plugin ./lib/mariadb/plugin
 
-EXPOSE 3000
-
-ENTRYPOINT [ "./docker/entrypoint" ]
-CMD [ "start" ]
+CMD "bundle exec rails db:migrate && bundle exec rails server -b 0.0.0.0"

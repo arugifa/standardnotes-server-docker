@@ -1,30 +1,34 @@
-# Based on https://github.com/standardfile/ruby-server/blob/master/docker-compose.yml
-
-version: '3'
+version: "3"
 
 services:
-  app:
+  standardnotes-server:
     build: .
-    env_file: app.env
-    entrypoint: ''
     # Wait for database container to start before running the server.
     command: >
-      sh -c 'while ! nc -vz db 3306 ; do sleep 10 ; done &&
-             /data/src/docker/entrypoint bootstrap &&
-             /data/src/docker/entrypoint start'
+      sh -c 'while ! nc -vz mysql 3306 ; do sleep 10 ; done &&
+             bundle exec rails db:migrate &&
+             bundle exec rails server -b 0.0.0.0'
     depends_on:
-      - db
+      - mysql
+    environment:
+      RAILS_ENV: development
+      DB_HOST: mysql
+      DB_PASSWORD: secret123
 
-  db:
+  mysql:
     image: mysql:latest
-    env_file: db.env
+    environment:
+      MYSQL_DATABASE: standardnotes
+      MYSQL_USER: standardnotes
+      MYSQL_PASSWORD: secret123
+      MYSQL_ROOT_PASSWORD: secret456
 
   sut:
     image: alpine:latest
     # Wait for the database container to start,
     # and the StandardNotes server to run migrations, before running tests
     command: >
-      sh -c 'while ! nc -vz db 3306 ; do sleep 10 ; done &&
-             for i in 1 2 3 4 5 6; do wget app:3000 && break || if [ "$$i" != 6 ]; then sleep 10 ; else exit 1 ; fi; done'
+      sh -c 'while ! nc -vz mysql 3306 ; do sleep 10 ; done &&
+             for i in 1 2 3 4 5 6; do wget standardnotes-server:3000 && break || if [ "$$i" != 6 ]; then sleep 10 ; else exit 1 ; fi; done'
     depends_on:
-      - app
+      - standardnotes-server
