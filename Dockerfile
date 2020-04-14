@@ -1,4 +1,4 @@
-# Based on https://github.com/standardfile/ruby-server/blob/master/Dockerfile
+# Based on https://github.com/standardnotes/syncing-server/blob/master/Dockerfile
 
 FROM ruby:2-alpine
 
